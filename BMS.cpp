@@ -3,7 +3,27 @@
 #include<fstream>
 #include<limits>
 #include<iomanip>
+#include<conio.h>
 using namespace std;
+
+//Reads input character by character, masking it with '*' (used for password/pin entry)
+string getMaskedInput(){
+    string input = "";
+    char ch;
+    while((ch = getch()) != '\r' && ch != '\n'){
+        if(ch == '\b' || ch == 127){
+            if(!input.empty()){
+                input.pop_back();
+                cout << "\b \b";
+            }
+        } else {
+            input.push_back(ch);
+            cout << '*';
+        }
+    }
+    cout << endl;
+    return input;
+}
 
 //Bank Management System CLI
 
@@ -25,9 +45,9 @@ class Account{
         cout<<"enter the valid citizenship number:"<<endl;
         cin>>citizen;
         cout<<"set a password for your account:"<<endl;
-        cin>>password;
+        password = getMaskedInput();
         cout<<"set a pin for your account:"<<endl;
-        cin>>pin;
+        pin = stoi(getMaskedInput());
         cout<<"enter your initial deposit amount:"<<endl;
         cin>>balance;
         while(cin.fail() || balance < 0){
@@ -218,12 +238,11 @@ class GenerateA: public Account{
       cout << "Enter your account number: ";
       cin >> loginAccNo;
       cout << "Enter your password: ";
-      cin >> loginPass;
+      loginPass = getMaskedInput();
       cout << "Enter your PIN: ";
-      cin >> loginPin;
-      if(cin.fail()){
-          cin.clear();
-          cin.ignore(numeric_limits<streamsize>::max(), '\n');
+      try{
+          loginPin = stoi(getMaskedInput());
+      } catch(const exception&){
           cout << "Invalid PIN input.\n";
           return false;
       }
@@ -318,10 +337,9 @@ class GenerateA: public Account{
     void withdraw(){
         int enteredPin;
         cout << "Enter your PIN to authorize withdrawal: ";
-        cin >> enteredPin;
-        if(cin.fail()){
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        try{
+            enteredPin = stoi(getMaskedInput());
+        } catch(const exception&){
             cout << "Invalid PIN input.\n";
             return;
         }
@@ -403,10 +421,9 @@ class GenerateA: public Account{
     
         int enteredPin;
         cout << "Enter your PIN to authorize transfer: ";
-        cin >> enteredPin;
-        if(cin.fail()){
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        try{
+            enteredPin = stoi(getMaskedInput());
+        } catch(const exception&){
             cout << "Invalid PIN input.\n";
             return;
         }
