@@ -6,6 +6,24 @@
 #include<conio.h>
 using namespace std;
 
+string getMaskedInput(){
+    string input = "";
+    char ch;
+    while((ch = getch()) != '\r' && ch != '\n'){
+        if(ch == '\b' || ch == 127){
+            if(!input.empty()){
+                input.pop_back();
+                cout << "\b \b";
+            }
+        } else {
+            input.push_back(ch);
+            cout << '*';
+        }
+    }
+    cout << endl;
+    return input;
+}
+
 //Bank Management System CLI
 
 class Account{
@@ -131,24 +149,6 @@ bool updateBalance(int accno, double newBalance){
     outFile.close();
 
     return true;
-}
-
-string getMaskedInput(){
-    string input = "";
-    char ch;
-    while((ch = getch()) != '\r' && ch != '\n'){
-        if(ch == '\b' || ch == 127){
-            if(!input.empty()){
-                input.pop_back();
-                cout << "\b \b";
-            }
-        } else {
-            input.push_back(ch);
-            cout << '*';
-        }
-    }
-    cout << endl;
-    return input;
 }
 
 string getAccountName(int accno){
