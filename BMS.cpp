@@ -6,7 +6,7 @@
 #include<conio.h>
 using namespace std;
 
-string getMaskedInput(){
+string getMaskedInput(){     //masks the password as *
     string input = "";
     char ch;
     while((ch = getch()) != '\r' && ch != '\n'){
@@ -26,7 +26,7 @@ string getMaskedInput(){
 
 //Bank Management System CLI
 
-class Account{
+class Account{     //opening a bank account
     public:
       string name;
       string lname;
@@ -57,7 +57,7 @@ class Account{
         }
       }
 
-      void save(){
+      void save(){  //stores the account details in accounts.dat file
         ofstream outFile("accounts.dat", ios::app);
         if(!outFile){
             cout<<"Error: could not open accounts.dat\n";
@@ -68,7 +68,7 @@ class Account{
       }
 };
 
-class Welcome{
+class Welcome{  //welcome interface
     public:
         Welcome(){
             cout << "\n";
@@ -80,7 +80,7 @@ class Welcome{
         }
 };
 
-double getBalance(int accno){
+double getBalance(int accno){         
     ifstream inFile("accounts.dat");
     if(!inFile) return -1;
 
