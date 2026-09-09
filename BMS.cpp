@@ -80,7 +80,7 @@ class Welcome{  //welcome interface
         }
 };
 
-double getBalance(int accno){         
+double getBalance(int accno){  //helps to read balance from the account.dat     
     ifstream inFile("accounts.dat");
     if(!inFile) return -1;
 
@@ -99,8 +99,8 @@ double getBalance(int accno){
         string fileAccNo = line.substr(pos2+1, pos3-pos2-1);
         string fileBalance = line.substr(pos5+1);
 
-        try{
-            if(stoi(fileAccNo) == accno){
+        try{  //try-catch function
+            if(stoi(fileAccNo) == accno){ //stoi is string to integer conversion
                 return stod(fileBalance);
             }
         } catch(const exception&){
@@ -110,7 +110,7 @@ double getBalance(int accno){
     return -1;
 }
 
-bool updateBalance(int accno, double newBalance){
+bool updateBalance(int accno, double newBalance){   //upsates the balance by reading from accounts.dat
     ifstream inFile("accounts.dat");
     if(!inFile) return false;
 
@@ -151,7 +151,7 @@ bool updateBalance(int accno, double newBalance){
     return true;
 }
 
-string getAccountName(int accno){
+string getAccountName(int accno){  //account holders name
     ifstream inFile("accounts.dat");
     if(!inFile) return "";
 
@@ -177,7 +177,7 @@ string getAccountName(int accno){
     return "";
 }
 
-int getAccountPin(int accno){
+int getAccountPin(int accno){  //to authenticate
     ifstream inFile("accounts.dat");
     if(!inFile) return -1;
 
@@ -219,7 +219,7 @@ void saveTransaction(int fromAcc, int toAcc, double amount){
 // END ADDED
 
 
-class GenerateA: public Account{
+class GenerateA: public Account{    //generates teh coount no. by increamenting
   public:
     int no=1000;
     void accno(){
@@ -229,7 +229,7 @@ class GenerateA: public Account{
       cout<<"Your Account has been successfully created"<< endl;
     }
 
-    bool login(){
+    bool login(){  //login interface
       int loginAccNo;
       string loginPass;
       int loginPin; 
@@ -297,7 +297,7 @@ class GenerateA: public Account{
       return true;
     }
 
-    void checkBalance(){
+    void checkBalance(){  //to check the balance of the account.
         double bal = getBalance(accountno);
         if(bal < 0){
             cout << "Could not retrieve balance.\n";
@@ -307,7 +307,7 @@ class GenerateA: public Account{
         cout << "Your current balance is: " << balance << endl;
     }
 
-    void deposit(){
+    void deposit(){  //to deposite
         double amount;
         cout << "Enter amount to deposit: ";
         cin >> amount;
@@ -333,7 +333,7 @@ class GenerateA: public Account{
         }
     }
 
-    void withdraw(){
+    void withdraw(){ //to withdraw balance
         int enteredPin;
         cout << "Enter your PIN to authorize withdrawal: ";
         try{
@@ -378,7 +378,7 @@ class GenerateA: public Account{
         }
     }
 
-    void transfer(){
+    void transfer(){  //to transfer the fund from one account to another consisting of pin authentication
         
 
         int receiverAcc;
@@ -458,7 +458,7 @@ class GenerateA: public Account{
         cout << "Your new balance: " << balance << endl;
     }
     
-    void statement(){
+    void statement(){  //to view the statement of the account
         double bal = getBalance(accountno);
         if(bal < 0){
             cout << "Could not retrieve account details.\n";
@@ -525,7 +525,7 @@ class GenerateA: public Account{
 
 bool readChoice(int &value); 
 
-struct AdminView{
+struct AdminView{  //admin panel
     int accountno;
     string holderName;
     string citizen;
