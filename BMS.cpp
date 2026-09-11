@@ -532,7 +532,7 @@ struct AdminView{  //admin panel
     double balance;
 };
 
-bool parseAdminView(const string &line, AdminView &out){
+bool parseAdminView(const string &line, AdminView &out){  //Admin view
     if(line.empty()) return false;
  
     size_t pos1 = line.find('|');
@@ -559,7 +559,7 @@ bool parseAdminView(const string &line, AdminView &out){
     return true;
 }
  
-void printAdminHeader(){
+void printAdminHeader(){  //displays the headere of the admin panel
     cout << left
          << setw(12) << "Acc No"
          << setw(24) << "Holder Name"
@@ -568,7 +568,7 @@ void printAdminHeader(){
     cout << string(68, '-') << "\n";
 }
  
-void printAdminRow(const AdminView &v){
+void printAdminRow(const AdminView &v){    //displays the acoounts of the bank
     cout << left
          << setw(12) << v.accountno
          << setw(24) << v.holderName
@@ -576,7 +576,7 @@ void printAdminRow(const AdminView &v){
          << right << setw(14) << fixed << setprecision(2) << v.balance << "\n";
 }
  
-void adminViewAll(){
+void adminViewAll(){  //calls the admin functions
     ifstream inFile("accounts.dat");
     if(!inFile){
         cout << "Error: could not open accounts.dat\n";
@@ -603,7 +603,7 @@ void adminViewAll(){
     cout << "=====================================================\n";
 }
  
-void adminSearch(){
+void adminSearch(){  //search the accounts using their account number
     int accno;
     cout << "Enter account number to find: ";
     cin >> accno;
@@ -640,9 +640,9 @@ void adminSearch(){
     }
 }
 
-bool adminLogin(){
-    const string ADMIN_USER = "admin";
-    const string ADMIN_PASS = "admin123";
+bool adminLogin(){  //the admin login
+    const string ADMIN_USER = "Narayush";
+    const string ADMIN_PASS = "Narayush123";
  
     string user, pass;
     cout << "Enter admin username: ";
@@ -658,7 +658,7 @@ bool adminLogin(){
     return false;
 }
  
-void adminMenu(){
+void adminMenu(){   //admin panel display
     if(!adminLogin()) return;
  
     int achoice = 0;
@@ -690,7 +690,7 @@ void adminMenu(){
     } while(achoice != 3);
 }
 
-bool readChoice(int &value){
+bool readChoice(int &value){  
     cin >> value;
     if(cin.fail()){
         cin.clear();
@@ -700,7 +700,7 @@ bool readChoice(int &value){
     return true;
 }
 
-int loadNextAccountNo(){
+int loadNextAccountNo(){  //finds the highest account number currently stored in accounts.dat and returns the next available account number.
     ifstream inFile("accounts.dat");
     int maxNo = 999;
     string line;
@@ -725,9 +725,9 @@ int loadNextAccountNo(){
 }
 
 int main(){
-    Welcome w;
-    GenerateA c;
-    c.no = loadNextAccountNo();
+    Welcome w;  //welcom panel
+    GenerateA c;  //generates a bank accountnumber
+    c.no = loadNextAccountNo(); //helps to get next account
     int choice = 0;
     do{
         cout<< "1. Create a Bank Account\n";
