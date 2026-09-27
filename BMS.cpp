@@ -6,18 +6,24 @@
 #include<conio.h>
 using namespace std;
 
-string getMaskedInput(){     //masks the password as *
+string getMaskedInput() { //masking the password from N->*
     string input = "";
     char ch;
-    while((ch = getch()) != '\r' && ch != '\n'){
-        if(ch == '\b' || ch == 127){
-            if(!input.empty()){
-                input.pop_back();
+    while (true) {
+        ch = getch();
+
+        if (ch == '\r' || ch == '\n') {
+            break;
+        }
+        if (ch == '\b') {
+            if (input.length() > 0) {
+                input.erase(input.length() - 1);
                 cout << "\b \b";
             }
-        } else {
-            input.push_back(ch);
-            cout << '*';
+        }
+        else {
+            input += ch;
+            cout << "*";
         }
     }
     cout << endl;
@@ -73,137 +79,201 @@ class Welcome{  //welcome interface
         Welcome(){
             cout << "\n";
             cout << "=========================================\n";
-            cout << "        WELCOME TO Narayush BANK         \n";
-            cout << "         Bank Management System          \n";
+            cout << "       WELCOME TO Kharcha BANK         \n";
+            cout << "      Your Balance, Our Problem       \n";
             cout << "=========================================\n";
             cout << "\n";
         }
 };
 
-double getBalance(int accno){  //helps to read balance from the account.dat     
+double getBalance(int accno){     
     ifstream inFile("accounts.dat");
-    if(!inFile) return -1;
+
+    if(!inFile)
+        return -1;
 
     string line;
+
     while(getline(inFile, line)){
-        if(line.empty()) continue;
+
+        if(line.empty())
+            continue;
 
         size_t pos1 = line.find('|');
-        size_t pos2 = (pos1 == string::npos) ? string::npos : line.find('|', pos1+1);
-        size_t pos3 = (pos2 == string::npos) ? string::npos : line.find('|', pos2+1);
-        size_t pos4 = (pos3 == string::npos) ? string::npos : line.find('|', pos3+1);
-        size_t pos5 = (pos4 == string::npos) ? string::npos : line.find('|', pos4+1);
 
-        if(pos1==string::npos || pos2==string::npos || pos3==string::npos || pos4==string::npos || pos5==string::npos) continue;
+        size_t pos2;
+        if(pos1 == string::npos)
+            pos2 = string::npos;
+        else
+            pos2 = line.find('|', pos1 + 1);
 
-        string fileAccNo = line.substr(pos2+1, pos3-pos2-1);
-        string fileBalance = line.substr(pos5+1);
+        size_t pos3;
+        if(pos2 == string::npos)
+            pos3 = string::npos;
+        else
+            pos3 = line.find('|', pos2 + 1);
 
-        try{  //try-catch function
-            if(stoi(fileAccNo) == accno){ //stoi is string to integer conversion
+        size_t pos4;
+        if(pos3 == string::npos)
+            pos4 = string::npos;
+        else
+            pos4 = line.find('|', pos3 + 1);
+
+        size_t pos5;
+        if(pos4 == string::npos)
+            pos5 = string::npos;
+        else
+            pos5 = line.find('|', pos4 + 1);
+
+        if(pos1 == string::npos || pos2 == string::npos ||
+           pos3 == string::npos || pos4 == string::npos ||
+           pos5 == string::npos)
+            continue;
+
+        string fileAccNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
+        string fileBalance = line.substr(pos5 + 1);
+
+        try{
+            if(stoi(fileAccNo) == accno){
                 return stod(fileBalance);
             }
-        } catch(const exception&){
+        }
+        catch(const exception&){
             continue;
         }
     }
+
     return -1;
 }
 
-bool updateBalance(int accno, double newBalance){   //upsates the balance by reading from accounts.dat
+bool updateBalance(int accno, double newBalance){
     ifstream inFile("accounts.dat");
-    if(!inFile) return false;
 
-    string allLines = "";
+    if(!inFile)
+        return false;
+
+    string allLines;
     string line;
     bool found = false;
 
     while(getline(inFile, line)){
-        if(!line.empty()){
-            size_t pos1 = line.find('|');
-            size_t pos2 = (pos1 == string::npos) ? string::npos : line.find('|', pos1+1);
-            size_t pos3 = (pos2 == string::npos) ? string::npos : line.find('|', pos2+1);
-            size_t pos4 = (pos3 == string::npos) ? string::npos : line.find('|', pos3+1);
-            size_t pos5 = (pos4 == string::npos) ? string::npos : line.find('|', pos4+1);
 
-            if(pos1!=string::npos && pos2!=string::npos && pos3!=string::npos && pos4!=string::npos && pos5!=string::npos){
-                string fileAccNo = line.substr(pos2+1, pos3-pos2-1);
+        if(!line.empty()){
+
+            size_t pos1 = line.find('|');
+
+            size_t pos2;
+            if(pos1 == string::npos)
+                pos2 = string::npos;
+            else
+                pos2 = line.find('|', pos1 + 1);
+
+            size_t pos3;
+            if(pos2 == string::npos)
+                pos3 = string::npos;
+            else
+                pos3 = line.find('|', pos2 + 1);
+
+            size_t pos4;
+            if(pos3 == string::npos)
+                pos4 = string::npos;
+            else
+                pos4 = line.find('|', pos3 + 1);
+
+            size_t pos5;
+            if(pos4 == string::npos)
+                pos5 = string::npos;
+            else
+                pos5 = line.find('|', pos4 + 1);
+
+            if(pos1 != string::npos && pos2 != string::npos &&
+               pos3 != string::npos && pos4 != string::npos &&
+               pos5 != string::npos){
+
+                string fileAccNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
+
                 try{
                     if(stoi(fileAccNo) == accno){
-                        line = line.substr(0, pos5+1) + to_string(newBalance);
+                        line = line.substr(0, pos5 + 1) + to_string(newBalance);
                         found = true;
                     }
-                } catch(const exception&){
+                }
+                catch(const exception&){
                 }
             }
         }
+
         allLines += line + "\n";
     }
+
     inFile.close();
 
-    if(!found) return false;
+    if(!found)
+        return false;
 
     ofstream outFile("accounts.dat", ios::trunc);
-    if(!outFile) return false;
+
+    if(!outFile)
+        return false;
+
     outFile << allLines;
     outFile.close();
 
     return true;
 }
 
-string getAccountName(int accno){  //account holders name
+string getAccountName(int accno){
     ifstream inFile("accounts.dat");
-    if(!inFile) return "";
+
+    if(!inFile)
+        return "";
 
     string line;
+
     while(getline(inFile, line)){
-        if(line.empty()) continue;
-
         size_t pos1 = line.find('|');
-        size_t pos2 = (pos1 == string::npos) ? string::npos : line.find('|', pos1+1);
-        size_t pos3 = (pos2 == string::npos) ? string::npos : line.find('|', pos2+1);
+        size_t pos2 = line.find('|', pos1 + 1);
+        size_t pos3 = line.find('|', pos2 + 1);
 
-        if(pos1==string::npos || pos2==string::npos || pos3==string::npos) continue;
-
-        string fileAccNo = line.substr(pos2+1, pos3-pos2-1);
-        try{
-            if(stoi(fileAccNo) == accno){
-                return line.substr(0, pos1); 
-            }
-        } catch(const exception&){
+        if(pos1 == string::npos || pos2 == string::npos || pos3 == string::npos)
             continue;
-        }
+
+        string accountNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
+
+        if(stoi(accountNo) == accno)
+            return line.substr(0, pos1);
     }
+
     return "";
 }
 
-int getAccountPin(int accno){  //to authenticate
+int getAccountPin(int accno){
     ifstream inFile("accounts.dat");
-    if(!inFile) return -1;
+
+    if(!inFile)
+        return -1;
 
     string line;
+
     while(getline(inFile, line)){
-        if(line.empty()) continue;
-
         size_t pos1 = line.find('|');
-        size_t pos2 = (pos1 == string::npos) ? string::npos : line.find('|', pos1+1);
-        size_t pos3 = (pos2 == string::npos) ? string::npos : line.find('|', pos2+1);
-        size_t pos4 = (pos3 == string::npos) ? string::npos : line.find('|', pos3+1);
-        size_t pos5 = (pos4 == string::npos) ? string::npos : line.find('|', pos4+1);
+        size_t pos2 = line.find('|', pos1 + 1);
+        size_t pos3 = line.find('|', pos2 + 1);
+        size_t pos4 = line.find('|', pos3 + 1);
+        size_t pos5 = line.find('|', pos4 + 1);
 
-        if(pos1==string::npos || pos2==string::npos || pos3==string::npos || pos4==string::npos || pos5==string::npos) continue;
-
-        string fileAccNo = line.substr(pos2+1, pos3-pos2-1);
-        string filePin = line.substr(pos4+1, pos5-pos4-1);
-
-        try{
-            if(stoi(fileAccNo) == accno){
-                return stoi(filePin);
-            }
-        } catch(const exception&){
+        if(pos1 == string::npos || pos2 == string::npos ||
+           pos3 == string::npos || pos4 == string::npos ||
+           pos5 == string::npos)
             continue;
-        }
+
+        string accountNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
+        string pin = line.substr(pos4 + 1, pos5 - pos4 - 1);
+
+        if(stoi(accountNo) == accno)
+            return stoi(pin);
     }
+
     return -1;
 }
 
@@ -253,31 +323,31 @@ class GenerateA: public Account{    //generates teh coount no. by increamenting
       }
 
       string line;
-      bool found = false;
+bool found = false;
 
-      while(getline(inFile, line)){
-          if(line.empty()) continue;
+while(getline(inFile, line)){
+    if(line.empty())
+        continue;
 
-          size_t pos1 = line.find('|');
-          size_t pos2 = (pos1 == string::npos) ? string::npos : line.find('|', pos1+1);
-          size_t pos3 = (pos2 == string::npos) ? string::npos : line.find('|', pos2+1);
-          size_t pos4 = (pos3 == string::npos) ? string::npos : line.find('|', pos3+1);
+    size_t pos1 = line.find('|');
+    size_t pos2 = line.find('|', pos1 + 1);
+    size_t pos3 = line.find('|', pos2 + 1);
+    size_t pos4 = line.find('|', pos3 + 1);
 
-          if(pos1 == string::npos || pos2 == string::npos || pos3 == string::npos) continue;
+    if(pos1 == string::npos || pos2 == string::npos ||
+       pos3 == string::npos || pos4 == string::npos)
+        continue;
 
-          string fileAccNo = line.substr(pos2+1, pos3-pos2-1);
-          string filePass  = line.substr(pos3+1, pos4-pos3-1);
+    string accountNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
+    string password = line.substr(pos3 + 1, pos4 - pos3 - 1);
 
-          try{
-              if(stoi(fileAccNo) == loginAccNo && filePass == loginPass){
-                  found = true;
-                  break;
-              }
-          } catch(const exception&){
-              continue;
-          }
-      }
-      inFile.close();
+    if(stoi(accountNo) == loginAccNo && password == loginPass){
+        found = true;
+        break;
+    }
+}
+
+inFile.close();
 
       if(!found){
           cout << "Invalid account number or password.\n";
@@ -485,35 +555,43 @@ class GenerateA: public Account{    //generates teh coount no. by increamenting
         bool any = false;
 
         while(getline(inFile, line)){
-            if(line.empty()) continue;
+            if(line.empty())
+                continue;
 
             size_t pos1 = line.find('|');
-            size_t pos2 = (pos1 == string::npos) ? string::npos : line.find('|', pos1+1);
-            size_t pos3 = (pos2 == string::npos) ? string::npos : line.find('|', pos2+1);
+            size_t pos2 = line.find('|', pos1 + 1);
+            size_t pos3 = line.find('|', pos2 + 1);
 
-            if(pos1==string::npos || pos2==string::npos || pos3==string::npos) continue;
+            if(pos1 == string::npos || pos2 == string::npos ||
+            pos3 == string::npos)
+                continue;
 
-            string type   = line.substr(0, pos1);
-            string fromStr = line.substr(pos1+1, pos2-pos1-1);
-            string toStr   = line.substr(pos2+1, pos3-pos2-1);
-            string amtStr  = line.substr(pos3+1);
+            string type = line.substr(0, pos1);
+            string fromStr = line.substr(pos1 + 1, pos2 - pos1 - 1);
+            string toStr = line.substr(pos2 + 1, pos3 - pos2 - 1);
+            string amtStr = line.substr(pos3 + 1);
 
             try{
                 int fromAcc = stoi(fromStr);
-                int toAcc   = stoi(toStr);
-                double amt  = stod(amtStr);
+                int toAcc = stoi(toStr);
+                double amt = stod(amtStr);
 
                 if(fromAcc == accountno){
-                    cout << "[" << type << "] Sent Rs. " << amt << " to Account " << toAcc << endl;
-                    any = true;
-                } else if(toAcc == accountno){
-                    cout << "[" << type << "] Received Rs. " << amt << " from Account " << fromAcc << endl;
+                    cout << "[" << type << "] Sent Rs. " << amt
+                        << " to Account " << toAcc << endl;
                     any = true;
                 }
-            } catch(const exception&){
+                else if(toAcc == accountno){
+                    cout << "[" << type << "] Received Rs. " << amt
+                        << " from Account " << fromAcc << endl;
+                    any = true;
+                }
+            }
+            catch(const exception&){
                 continue;
             }
         }
+
         inFile.close();
 
         if(!any){
@@ -525,37 +603,44 @@ class GenerateA: public Account{    //generates teh coount no. by increamenting
 
 bool readChoice(int &value); 
 
-struct AdminView{  //admin panel
+struct AdminView{
     int accountno;
     string holderName;
     string citizen;
     double balance;
 };
 
-bool parseAdminView(const string &line, AdminView &out){  //Admin view
-    if(line.empty()) return false;
- 
+bool parseAdminView(const string &line, AdminView &out){
+
+    if(line.empty())
+        return false;
+
     size_t pos1 = line.find('|');
-    size_t pos2 = (pos1 == string::npos) ? string::npos : line.find('|', pos1+1);
-    size_t pos3 = (pos2 == string::npos) ? string::npos : line.find('|', pos2+1);
-    size_t pos4 = (pos3 == string::npos) ? string::npos : line.find('|', pos3+1);
-    size_t pos5 = (pos4 == string::npos) ? string::npos : line.find('|', pos4+1);
- 
-    if(pos1==string::npos || pos2==string::npos || pos3==string::npos || pos4==string::npos || pos5==string::npos) return false;
- 
-    string name    = line.substr(0, pos1);
-    string citizen = line.substr(pos1+1, pos2-pos1-1);
-    string accStr  = line.substr(pos2+1, pos3-pos2-1);
-    string balStr  = line.substr(pos5+1);
- 
+    size_t pos2 = line.find('|', pos1 + 1);
+    size_t pos3 = line.find('|', pos2 + 1);
+    size_t pos4 = line.find('|', pos3 + 1);
+    size_t pos5 = line.find('|', pos4 + 1);
+
+    if(pos1 == string::npos || pos2 == string::npos ||
+       pos3 == string::npos || pos4 == string::npos ||
+       pos5 == string::npos)
+        return false;
+
+    string name = line.substr(0, pos1);
+    string citizen = line.substr(pos1 + 1, pos2 - pos1 - 1);
+    string accStr = line.substr(pos2 + 1, pos3 - pos2 - 1);
+    string balStr = line.substr(pos5 + 1);
+
     try{
-        out.accountno  = stoi(accStr);
+        out.accountno = stoi(accStr);
         out.holderName = name;
-        out.citizen    = citizen;
-        out.balance    = stod(balStr);
-    } catch(const exception&){
+        out.citizen = citizen;
+        out.balance = stod(balStr);
+    }
+    catch(const exception&){
         return false;
     }
+
     return true;
 }
  
@@ -700,27 +785,38 @@ bool readChoice(int &value){
     return true;
 }
 
-int loadNextAccountNo(){  //finds the highest account number currently stored in accounts.dat and returns the next available account number.
+int loadNextAccountNo(){
+
     ifstream inFile("accounts.dat");
+
     int maxNo = 999;
     string line;
+
     while(getline(inFile, line)){
-        if(line.empty()) continue;
+        if(line.empty())
+            continue;
 
         size_t pos1 = line.find('|');
-        size_t pos2 = (pos1 == string::npos) ? string::npos : line.find('|', pos1+1);
-        size_t pos3 = (pos2 == string::npos) ? string::npos : line.find('|', pos2+1);
+        size_t pos2 = line.find('|', pos1 + 1);
+        size_t pos3 = line.find('|', pos2 + 1);
 
-        if(pos1 == string::npos || pos2 == string::npos || pos3 == string::npos) continue;
+        if(pos1 == string::npos || pos2 == string::npos ||
+           pos3 == string::npos)
+            continue;
 
-        string accNoStr = line.substr(pos2+1, pos3-pos2-1);
+        string accNoStr = line.substr(pos2 + 1, pos3 - pos2 - 1);
+
         try{
             int accNo = stoi(accNoStr);
-            if(accNo > maxNo) maxNo = accNo;
-        } catch(const exception&){
+
+            if(accNo > maxNo)
+                maxNo = accNo;
+        }
+        catch(const exception&){
             continue;
         }
     }
+
     return maxNo + 1;
 }
 
@@ -751,6 +847,11 @@ int main(){
                 if(!c.login()){
                     break;
                 }
+
+                string holderName = getAccountName(c.accountno);
+                cout << "\n=========================================\n";
+                cout << "   Welcome, " << holderName << "!\n";
+                cout << "=========================================\n";
                 int choic = 0;
                 do{
                     cout<< "1. Check Balance\n";
@@ -783,6 +884,9 @@ int main(){
                             c.statement(); 
                             break;
                         case 6:
+                            cout << "\n=========================================\n";
+                            cout << "              Logged Out                \n";
+                            cout << "=========================================\n";
                             break;
                         default:
                             cout << "Invalid choice!\n";
@@ -794,7 +898,6 @@ int main(){
                 adminMenu();
                 break;
             case 4:
-                cout << "Logged out"<<endl;
                 break;
             default:
                 cout << "Invalid choice!\n";
