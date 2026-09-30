@@ -76,7 +76,7 @@ class Account{     //opening a bank account
             cout<<"Error: could not open accounts.dat\n";
             return;
         }
-        outFile << endl << name << " " << lname << "|" << citizen << "|" << accountno << "|" << password << "|" << pin << "|" << balance << "\n";
+        outFile << name << " " << lname << "|" << citizen << "|" << accountno << "|" << password << "|" << pin << "|" << balance << "\n";
         outFile.close();
       }
 };
@@ -93,53 +93,25 @@ class Welcome{  //welcome interface
         }
 };
 
-double getBalance(int accno){     
+double getBalance(int accno){
     ifstream inFile("accounts.dat");
-
     if(!inFile)
         return -1;
-
     string line;
-
     while(getline(inFile, line)){
-
         if(line.empty())
             continue;
-
         size_t pos1 = line.find('|');
-
-        size_t pos2;
-        if(pos1 == string::npos)
-            pos2 = string::npos;
-        else
-            pos2 = line.find('|', pos1 + 1);
-
-        size_t pos3;
-        if(pos2 == string::npos)
-            pos3 = string::npos;
-        else
-            pos3 = line.find('|', pos2 + 1);
-
-        size_t pos4;
-        if(pos3 == string::npos)
-            pos4 = string::npos;
-        else
-            pos4 = line.find('|', pos3 + 1);
-
-        size_t pos5;
-        if(pos4 == string::npos)
-            pos5 = string::npos;
-        else
-            pos5 = line.find('|', pos4 + 1);
-
+        size_t pos2 = line.find('|', pos1 + 1);
+        size_t pos3 = line.find('|', pos2 + 1);
+        size_t pos4 = line.find('|', pos3 + 1);
+        size_t pos5 = line.find('|', pos4 + 1);
         if(pos1 == string::npos || pos2 == string::npos ||
            pos3 == string::npos || pos4 == string::npos ||
            pos5 == string::npos)
             continue;
-
         string fileAccNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
         string fileBalance = line.substr(pos5 + 1);
-
         try{
             if(stoi(fileAccNo) == accno){
                 return stod(fileBalance);
@@ -149,83 +121,46 @@ double getBalance(int accno){
             continue;
         }
     }
-
     return -1;
 }
 
 bool updateBalance(int accno, double newBalance){
     ifstream inFile("accounts.dat");
-
     if(!inFile)
         return false;
-
     string allLines;
     string line;
     bool found = false;
-
     while(getline(inFile, line)){
-
         if(!line.empty()){
-
             size_t pos1 = line.find('|');
-
-            size_t pos2;
-            if(pos1 == string::npos)
-                pos2 = string::npos;
-            else
-                pos2 = line.find('|', pos1 + 1);
-
-            size_t pos3;
-            if(pos2 == string::npos)
-                pos3 = string::npos;
-            else
-                pos3 = line.find('|', pos2 + 1);
-
-            size_t pos4;
-            if(pos3 == string::npos)
-                pos4 = string::npos;
-            else
-                pos4 = line.find('|', pos3 + 1);
-
-            size_t pos5;
-            if(pos4 == string::npos)
-                pos5 = string::npos;
-            else
-                pos5 = line.find('|', pos4 + 1);
-
-            if(pos1 != string::npos && pos2 != string::npos &&
-               pos3 != string::npos && pos4 != string::npos &&
-               pos5 != string::npos){
-
-                string fileAccNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
-
-                try{
-                    if(stoi(fileAccNo) == accno){
-                        line = line.substr(0, pos5 + 1) + to_string(newBalance);
-                        found = true;
-                    }
-                }
-                catch(const exception&){
+            size_t pos2 = line.find('|', pos1 + 1);
+            size_t pos3 = line.find('|', pos2 + 1);
+            size_t pos4 = line.find('|', pos3 + 1);
+            size_t pos5 = line.find('|', pos4 + 1);
+            if(pos1 == string::npos || pos2 == string::npos ||pos3 == string::npos || pos4 == string::npos ||pos5 == string::npos)
+                continue;
+            string fileAccNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
+            try{
+                if(stoi(fileAccNo) == accno){
+                    line = line.substr(0, pos5 + 1) + to_string(newBalance);
+                    found = true;
                 }
             }
+            catch(const exception&){
+                continue;
+            }
         }
-
         allLines += line + "\n";
     }
-
     inFile.close();
-
     if(!found)
         return false;
-
     ofstream outFile("accounts.dat", ios::trunc);
-
     if(!outFile)
         return false;
-
     outFile << allLines;
     outFile.close();
-
     return true;
 }
 
@@ -305,56 +240,40 @@ bool updatePin(int accno, int newPin) {
 
 string getAccountName(int accno){
     ifstream inFile("accounts.dat");
-
     if(!inFile)
         return "";
-
     string line;
-
     while(getline(inFile, line)){
         size_t pos1 = line.find('|');
         size_t pos2 = line.find('|', pos1 + 1);
         size_t pos3 = line.find('|', pos2 + 1);
-
         if(pos1 == string::npos || pos2 == string::npos || pos3 == string::npos)
             continue;
-
         string accountNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
-
         if(stoi(accountNo) == accno)
             return line.substr(0, pos1);
     }
-
     return "";
 }
 
 int getAccountPin(int accno){
     ifstream inFile("accounts.dat");
-
     if(!inFile)
         return -1;
-
     string line;
-
     while(getline(inFile, line)){
         size_t pos1 = line.find('|');
         size_t pos2 = line.find('|', pos1 + 1);
         size_t pos3 = line.find('|', pos2 + 1);
         size_t pos4 = line.find('|', pos3 + 1);
         size_t pos5 = line.find('|', pos4 + 1);
-
-        if(pos1 == string::npos || pos2 == string::npos ||
-           pos3 == string::npos || pos4 == string::npos ||
-           pos5 == string::npos)
+        if(pos1 == string::npos || pos2 == string::npos || pos3 == string::npos || pos4 == string::npos || pos5 == string::npos)
             continue;
-
         string accountNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
         string pin = line.substr(pos4 + 1, pos5 - pos4 - 1);
-
         if(stoi(accountNo) == accno)
             return stoi(pin);
     }
-
     return -1;
 }
 
@@ -368,8 +287,7 @@ string getAccountPassword(int accno) {
         size_t pos2 = line.find('|', pos1 + 1);
         size_t pos3 = line.find('|', pos2 + 1);
         size_t pos4 = line.find('|', pos3 + 1);
-        if (pos1 == string::npos || pos2 == string::npos ||
-            pos3 == string::npos || pos4 == string::npos)
+        if (pos1 == string::npos || pos2 == string::npos ||pos3 == string::npos || pos4 == string::npos)
             continue;
         string accountNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
         string password = line.substr(pos3 + 1, pos4 - pos3 - 1);
@@ -413,17 +331,17 @@ void saveTransaction(int fromAcc, int toAcc, double amount){
     outFile << "TRANSFER" << "|" << fromAcc << "|" << toAcc << "|" << amount << "\n";
     outFile.close();
 }
-// END ADDED
 
-
-class GenerateA: public Account{    //generates teh coount no. by increamenting
+class GenerateA: public Account{    //generates the coount no. by increamenting
   public:
     int no=1000;
     void accno(){
       accountno = no;      
       no++;                
       cout<<"your account number is "<<accountno<<endl;
-      cout<<"Your Account has been successfully created"<< endl;
+      cout << "=============================================\n";
+      cout<<"   Your Account has been successfully created"<< endl;
+      cout << "=============================================\n";
     }
 
     bool login(){  //login interface
@@ -445,370 +363,387 @@ class GenerateA: public Account{    //generates teh coount no. by increamenting
           cout << "==========================================\n";
           return false;
       }
-
       ifstream inFile("accounts.dat");
       if(!inFile){
           cout << "==========================================\n";
           cout << "   Error: could not open accounts.dat.\n";
           cout << "==========================================\n";
-          cout << "Error: could not open accounts.dat\n";
           return false;
       }
-
       string line;
-bool found = false;
-
-while(getline(inFile, line)){
-    if(line.empty())
-        continue;
-
-    size_t pos1 = line.find('|');
-    size_t pos2 = line.find('|', pos1 + 1);
-    size_t pos3 = line.find('|', pos2 + 1);
-    size_t pos4 = line.find('|', pos3 + 1);
-
-    if(pos1 == string::npos || pos2 == string::npos ||
-       pos3 == string::npos || pos4 == string::npos)
-        continue;
-
-    string accountNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
-    string password = line.substr(pos3 + 1, pos4 - pos3 - 1);
-
-    if(stoi(accountNo) == loginAccNo && password == loginPass){
-        found = true;
-        break;
-    }
-}
-
-inFile.close();
-
-      if(!found){
-          cout << "==========================================\n";
-          cout << "   Invalid account number or password.\n";
-          cout << "          Please Try Again.\n";
-          cout << "==========================================\n";
-          return false;
-      }
-
-   
-      int storedPin = getAccountPin(loginAccNo);
-      if(storedPin < 0 || storedPin != loginPin){
-          cout << "==========================================\n";
-          cout << "             Invalid PIN.\n";
-          cout << "          Please Try Again.\n";
-          cout << "==========================================\n";
-          return false;
-      }
-
-      accountno = loginAccNo;
-      balance = getBalance(accountno);
-          cout << "==========================================\n";
-          cout << "            Login Successful\n";
-          cout << "==========================================\n";
-      return true;
-    }
-
-    void checkBalance(){  //to check the balance of the account.
-        double bal = getBalance(accountno);
-        if(bal < 0){
-            cout << "Could not retrieve balance.\n";
-            return;
-        }
-        balance = bal;
-        cout << "Your current balance is: " << balance << endl;
-    }
-
-    void deposit(){  //to deposite
-        double amount;
-        cout << "Enter amount to deposit: ";
-        cin >> amount;
-        if(cin.fail() || amount <= 0){
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid amount.\n";
-            return;
-        }
-
-        double current = getBalance(accountno);
-        if(current < 0){
-            cout << "Could not retrieve balance.\n";
-            return;
-        }
-
-        double updated = current + amount;
-        if(updateBalance(accountno, updated)){
-            balance = updated;
-            cout << "Deposit successful. New balance: " << balance << endl;
-        } else {
-            cout << "Deposit failed.\n";
-        }
-    }
-
-    void withdraw(){ //to withdraw balance
-        int enteredPin;
-        cout << "Enter your PIN to authorize withdrawal: ";
-        try{
-            enteredPin = stoi(getMaskedInput());
-        } catch(const exception&){
-            cout << "Invalid PIN input.\n";
-            return;
-        }
-        int storedPin = getAccountPin(accountno);
-        if(storedPin < 0 || enteredPin != storedPin){
-            cout << "Incorrect PIN. Withdrawal cancelled.\n";
-            return;
-        }
-
-        double amount;
-        cout << "Enter amount to withdraw: ";
-        cin >> amount;
-        if(cin.fail() || amount <= 0){
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid amount.\n";
-            return;
-        }
-
-        double current = getBalance(accountno);
-        if(current < 0){
-            cout << "Could not retrieve balance.\n";
-            return;
-        }
-
-        if(amount > current){
-            cout << "Insufficient balance. Current balance: " << current << endl;
-            return;
-        }
-
-        double updated = current - amount;
-        if(updateBalance(accountno, updated)){
-            balance = updated;
-            cout << "Withdrawal successful. New balance: " << balance << endl;
-        } else {
-            cout << "Withdrawal failed.\n";
-        }
-    }
-
-    void transfer(){  //to transfer the fund from one account to another consisting of pin authentication
-        
-
-        int receiverAcc;
-        cout << "Enter receiver's account number: ";
-        cin >> receiverAcc;
-        if(cin.fail()){
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid account number.\n";
-            return;
-        }
-
-        if(receiverAcc == accountno){
-            cout << "You cannot transfer money to your own account.\n";
-            return;
-        }
-
-        double receiverBalance = getBalance(receiverAcc);
-        if(receiverBalance < 0){
-            cout << "Transfer failed: receiver account does not exist.\n";
-            return;
-        }
-
-        double senderBalance = getBalance(accountno);
-        if(senderBalance < 0){
-            cout << "Transfer failed: could not retrieve your account details.\n";
-            return;
-        }
-
-        double amount;
-        cout << "Enter amount to transfer: ";
-        cin >> amount;
-        if(cin.fail() || amount <= 0){
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid amount.\n";
-            return;
-        }
-    
-        int enteredPin;
-        cout << "Enter your PIN to authorize transfer: ";
-        try{
-            enteredPin = stoi(getMaskedInput());
-        } catch(const exception&){
-            cout << "Invalid PIN input.\n";
-            return;
-        }
-        int storedPin = getAccountPin(accountno);
-        if(storedPin < 0 || enteredPin != storedPin){
-            cout << "Incorrect PIN. Transfer cancelled.\n";
-            return;
-        }
-    
-        if(amount > senderBalance){
-            cout << "Transfer failed: insufficient balance. Current balance: " << senderBalance << endl;
-            return;
-        }
-
-        double newSenderBalance = senderBalance - amount;
-        double newReceiverBalance = receiverBalance + amount;
-
-        if(!updateBalance(accountno, newSenderBalance)){
-            cout << "Transfer failed: could not update your account. No changes were made.\n";
-            return;
-        }
-
-        if(!updateBalance(receiverAcc, newReceiverBalance)){
-            updateBalance(accountno, senderBalance); 
-            cout << "Transfer failed: could not update receiver account. Your balance has been restored.\n";
-            return;
-        }
-
-        balance = newSenderBalance;
-        saveTransaction(accountno, receiverAcc, amount);
-
-        cout << "Transfer successful! Rs. " << amount << " sent to account " << receiverAcc << ".\n";
-        cout << "Your new balance: " << balance << endl;
-    }
-    
-    void statement(){  //to view the statement of the account
-        double bal = getBalance(accountno);
-        if(bal < 0){
-            cout << "Could not retrieve account details.\n";
-            return;
-        }
-        balance = bal;
-        string holderName = getAccountName(accountno);
-
-        cout << "\n========== ACCOUNT STATEMENT ==========\n";
-        cout << "Account Number  : " << accountno << endl;
-        cout << "Account Holder  : " << holderName << endl;
-        cout << "Current Balance : " << balance << endl;
-        cout << "----------------------------------------\n";
-        cout << "Transaction History (Transfers):\n";
-
-        ifstream inFile("transactions.dat");
-        if(!inFile){
-            cout << "No transactions found.\n";
-            cout << "========================================\n";
-            return;
-        }
-
-        string line;
-        bool any = false;
+        bool found = false;
 
         while(getline(inFile, line)){
             if(line.empty())
                 continue;
-
             size_t pos1 = line.find('|');
             size_t pos2 = line.find('|', pos1 + 1);
             size_t pos3 = line.find('|', pos2 + 1);
-
-            if(pos1 == string::npos || pos2 == string::npos ||
-            pos3 == string::npos)
+            size_t pos4 = line.find('|', pos3 + 1);
+            if(pos1 == string::npos || pos2 == string::npos ||pos3 == string::npos || pos4 == string::npos)
                 continue;
-
-            string type = line.substr(0, pos1);
-            string fromStr = line.substr(pos1 + 1, pos2 - pos1 - 1);
-            string toStr = line.substr(pos2 + 1, pos3 - pos2 - 1);
-            string amtStr = line.substr(pos3 + 1);
-
-            try{
-                int fromAcc = stoi(fromStr);
-                int toAcc = stoi(toStr);
-                double amt = stod(amtStr);
-
-                if(fromAcc == accountno){
-                    cout << "[" << type << "] Sent Rs. " << amt
-                        << " to Account " << toAcc << endl;
-                    any = true;
-                }
-                else if(toAcc == accountno){
-                    cout << "[" << type << "] Received Rs. " << amt
-                        << " from Account " << fromAcc << endl;
-                    any = true;
-                }
-            }
-            catch(const exception&){
-                continue;
+            string accountNo = line.substr(pos2 + 1, pos3 - pos2 - 1);
+            string password = line.substr(pos3 + 1, pos4 - pos3 - 1);
+            if(stoi(accountNo) == loginAccNo && password == loginPass){
+                found = true;
+                break;
             }
         }
-
         inFile.close();
 
-        if(!any){
-            cout << "No transactions found.\n";
-        }
-        cout << "========================================\n";
-    }
+            if(!found){
+                cout << "==========================================\n";
+                cout << "   Invalid account number or password.\n";
+                cout << "          Please Try Again.\n";
+                cout << "==========================================\n";
+                return false;
+            }
 
-    void changePassword() {
-            string currentPassword;
-            string newPassword;
-            string confirmPassword;
-            cout << "Enter your current password: ";
-            currentPassword = getMaskedInput();
-            string storedPassword = getAccountPassword(accountno);
-            if (currentPassword != storedPassword) {
-                cout << "Incorrect current password.\n";
-                return;
+        
+            int storedPin = getAccountPin(loginAccNo);
+            if(storedPin < 0 || storedPin != loginPin){
+                cout << "==========================================\n";
+                cout << "             Invalid PIN.\n";
+                cout << "          Please Try Again.\n";
+                cout << "==========================================\n";
+                return false;
             }
-            cout << "Enter your new password: ";
-            newPassword = getMaskedInput();
-            if (newPassword == "") {
-                cout << "Password cannot be empty.\n";
-                return;
-            }
-            if (newPassword == storedPassword) {
-                cout << "New password must be different from the current password.\n";
-                return;
-            }
-            cout << "Confirm your new password: ";
-            confirmPassword = getMaskedInput();
-            if (newPassword != confirmPassword) {
-                cout << "Passwords do not match.\n";
-                return;
-            }
-            if (updatePassword(accountno, newPassword)) {
-                password = newPassword;
-                cout << "Password changed successfully.\n";
-            }
-            else {
-                cout << "Password change failed.\n";
-            }
-        }
 
-    void changePin() {
-        int currentPin;
-        int newPin;
-        int confirmPin;
-        cout << "Enter your current PIN: ";
-        currentPin = stoi(getMaskedInput());
-        int storedPin = getAccountPin(accountno);
+            accountno = loginAccNo;
+            balance = getBalance(accountno);
+                cout << "==========================================\n";
+                cout << "            Login Successful\n";
+                cout << "==========================================\n";
+            return true;
+            }
 
-        if (currentPin != storedPin) {
-            cout << "Incorrect current PIN.\n";
-            return;
-        }
-        cout << "Enter your new PIN: ";
-        newPin = stoi(getMaskedInput());
-        if (newPin == storedPin) {
-            cout << "New PIN must be different from the current PIN.\n";
-            return;
-        }
-        cout << "Confirm your new PIN: ";
-        confirmPin = stoi(getMaskedInput());
-        if (newPin != confirmPin) {
-            cout << "PINs do not match.\n";
-            return;
-        }
-        if (updatePin(accountno, newPin)) {
-            pin = newPin;
-            cout << "PIN changed successfully.\n";
-        }
-        else {
-            cout << "PIN change failed.\n";
-        }
-    }
+            void checkBalance(){  //to check the balance of the account.
+                double bal = getBalance(accountno);
+                if(bal < 0){
+                    cout << "Could not retrieve balance.\n";
+                    return;
+                }
+                balance = bal;
+                cout<<"========================================\n";
+                cout << " Your current balance is: " << balance << endl;
+                cout<<"========================================\n";
+            }
+
+            void deposit(){  //to deposite
+                double amount;
+                cout << "Enter amount to deposit: ";
+                cin >> amount;
+                if(cin.fail() || amount <= 0){
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid amount.\n";
+                    return;
+                }
+
+                double current = getBalance(accountno);
+                if(current < 0){
+                    cout << "Could not retrieve balance.\n";
+                    return;
+                }
+
+                double updated = current + amount;
+                if(updateBalance(accountno, updated)){
+                    balance = updated;
+                    cout<<"==========================================\n";
+                    cout << "   Deposit successful. New balance: " << balance << endl;
+                    cout<<"========================================\n";
+                } else {
+                    cout << "Deposit failed.\n";
+                }
+            }
+
+            void withdraw(){ //to withdraw balance
+                int enteredPin;
+                cout << "Enter your PIN to authorize withdrawal: ";
+                try{
+                    enteredPin = stoi(getMaskedInput());
+                } catch(const exception&){
+                    cout << "Invalid PIN input.\n";
+                    return;
+                }
+                int storedPin = getAccountPin(accountno);
+                if(storedPin < 0 || enteredPin != storedPin){
+                    cout << "Incorrect PIN. Withdrawal cancelled.\n";
+                    return;
+                }
+
+                double amount;
+                cout << "Enter amount to withdraw: ";
+                cin >> amount;
+                if(cin.fail() || amount <= 0){
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid amount.\n";
+                    return;
+                }
+
+                double current = getBalance(accountno);
+                if(current < 0){
+                    cout << "Could not retrieve balance.\n";
+                    return;
+                }
+
+                if(amount > current){
+                    cout << "Insufficient balance. Current balance: " << current << endl;
+                    return;
+                }
+
+                double updated = current - amount;
+                if(updateBalance(accountno, updated)){
+                    balance = updated;
+                    cout<<"=============================================\n";
+                    cout << "  Withdrawal successful. New balance: " << balance << endl;
+                    cout<<"=============================================\n";
+                } else {
+                    cout << "Withdrawal failed.\n";
+                }
+            }
+
+            void transfer(){  //to transfer the fund from one account to another consisting of pin authentication
+                int receiverAcc;
+                cout << "Enter receiver's account number: ";
+                cin >> receiverAcc;
+                if(cin.fail()){
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid account number.\n";
+                    return;
+                }
+
+                if(receiverAcc == accountno){
+                    cout << "You cannot transfer money to your own account.\n";
+                    return;
+                }
+
+                double receiverBalance = getBalance(receiverAcc);
+                if(receiverBalance < 0){
+                    cout << "Transfer failed: receiver account does not exist.\n";
+                    return;
+                }
+
+                double senderBalance = getBalance(accountno);
+                if(senderBalance < 0){
+                    cout << "Transfer failed: could not retrieve your account details.\n";
+                    return;
+                }
+
+                double amount;
+                cout << "Enter amount to transfer: ";
+                cin >> amount;
+                if(cin.fail() || amount <= 0){
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid amount.\n";
+                    return;
+                }
+            
+                int enteredPin;
+                cout << "Enter your PIN to authorize transfer: ";
+                try{
+                    enteredPin = stoi(getMaskedInput());
+                } catch(const exception&){
+                    cout << "Invalid PIN input.\n";
+                    return;
+                }
+                int storedPin = getAccountPin(accountno);
+                if(storedPin < 0 || enteredPin != storedPin){
+                    cout << "Incorrect PIN. Transfer cancelled.\n";
+                    return;
+                }
+            
+                if(amount > senderBalance){
+                    cout << "Transfer failed: insufficient balance. Current balance: " << senderBalance << endl;
+                    return;
+                }
+
+                double newSenderBalance = senderBalance - amount;
+                double newReceiverBalance = receiverBalance + amount;
+
+                if(!updateBalance(accountno, newSenderBalance)){
+                    cout << "Transfer failed: could not update your account. No changes were made.\n";
+                    return;
+                }
+
+                if(!updateBalance(receiverAcc, newReceiverBalance)){
+                    updateBalance(accountno, senderBalance); 
+                    cout << "Transfer failed: could not update receiver account. Your balance has been restored.\n";
+                    return;
+                }
+
+                balance = newSenderBalance;
+                saveTransaction(accountno, receiverAcc, amount);
+                
+                cout<<"=====================================================\n";
+                cout << "  Transfer successful! Rs. " << amount << " sent to account " << receiverAcc << ".\n";
+                cout<<"=====================================================\n";
+                cout << "Your new balance: " << balance << endl;
+            }
+            
+            void statement(){  //to view the statement of the account
+                double bal = getBalance(accountno);
+                if(bal < 0){
+                    cout << "Could not retrieve account details.\n";
+                    return;
+                }
+                balance = bal;
+                string holderName = getAccountName(accountno);
+
+                cout << "\n========== ACCOUNT STATEMENT ==========\n";
+                cout << "Account Number  : " << accountno << endl;
+                cout << "Account Holder  : " << holderName << endl;
+                cout << "Current Balance : " << balance << endl;
+                cout << "----------------------------------------\n";
+                cout << "Transaction History (Transfers):\n";
+
+                ifstream inFile("transactions.dat");
+                if(!inFile){
+                    cout << "No transactions found.\n";
+                    cout << "========================================\n";
+                    return;
+                }
+
+                string line;
+                bool any = false;
+                while(getline(inFile, line)){
+                    if(line.empty())
+                        continue;
+                    size_t pos1 = line.find('|');
+                    size_t pos2 = line.find('|', pos1 + 1);
+                    size_t pos3 = line.find('|', pos2 + 1);
+                    if(pos1 == string::npos || pos2 == string::npos || pos3 == string::npos)
+                        continue;
+                    string type = line.substr(0, pos1);
+                    string fromStr = line.substr(pos1 + 1, pos2 - pos1 - 1);
+                    string toStr = line.substr(pos2 + 1, pos3 - pos2 - 1);
+                    string amtStr = line.substr(pos3 + 1);
+
+                    try{
+                        int fromAcc = stoi(fromStr);
+                        int toAcc = stoi(toStr);
+                        double amt = stod(amtStr);
+                        if(fromAcc == accountno){
+                            cout << "[" << type << "] Sent Rs. " << amt
+                                << " to Account " << toAcc << endl;
+                            any = true;
+                        }
+                        else if(toAcc == accountno){
+                            cout << "[" << type << "] Received Rs. " << amt
+                                << " from Account " << fromAcc << endl;
+                            any = true;
+                        }
+                    }
+                    catch(const exception&){
+                        continue;
+                    }
+                }
+
+                inFile.close();
+
+                if(!any){
+                    cout << "No transactions found.\n";
+                }
+                cout << "========================================\n";
+            }
+
+            void changePassword() {
+                    string currentPassword;
+                    string newPassword;
+                    string confirmPassword;
+                    cout << "Enter your current password: ";
+                    currentPassword = getMaskedInput();
+                    string storedPassword = getAccountPassword(accountno);
+                    if (currentPassword != storedPassword) {
+                        cout << "Incorrect current password.\n";
+                        return;
+                    }
+                    cout << "Enter your new password: ";
+                    newPassword = getMaskedInput();
+                    if (newPassword == "") {
+                        cout << "Password cannot be empty.\n";
+                        return;
+                    }
+                    if (newPassword == storedPassword) {
+                        cout << "New password must be different from the current password.\n";
+                        return;
+                    }
+                    cout << "Confirm your new password: ";
+                    confirmPassword = getMaskedInput();
+                    if (newPassword != confirmPassword) {
+                        cout << "Passwords do not match.\n";
+                        return;
+                    }
+                    if (updatePassword(accountno, newPassword)) {
+                        password = newPassword;
+                        cout<<"=====================================\n";
+                        cout << "  Password changed successfully.\n";
+                        cout<<"=====================================\n";
+                    }
+                    else {
+                        cout<<"=====================================\n";
+                        cout << "     Password change failed.\n";
+                        cout<<"=====================================\n";
+                    }
+                }
+
+                void changePin() {
+                int currentPin;
+                int newPin;
+                int confirmPin;
+                cout << "Enter your current PIN: ";
+                try {
+                    currentPin = stoi(getMaskedInput());
+                }
+                catch(const exception&) {
+                    cout << "Invalid PIN input.\n";
+                    return;
+                }
+                int storedPin = getAccountPin(accountno);
+
+                if (currentPin != storedPin) {
+                    cout << "Incorrect current PIN.\n";
+                    return;
+                }
+                cout << "Enter your new PIN: ";
+                try {
+                    newPin = stoi(getMaskedInput());
+                }
+                catch(const exception&) {
+                    cout << "Invalid PIN input.\n";
+                    return;
+                }
+                if (newPin == storedPin) {
+                    cout << "New PIN must be different from the current PIN.\n";
+                    return;
+                }
+                cout << "Confirm your new PIN: ";
+                try {
+                    confirmPin = stoi(getMaskedInput());
+                }
+                catch(const exception&) {
+                    cout << "Invalid PIN input.\n";
+                    return;
+                }
+                if (newPin != confirmPin) {
+                    cout << "PINs do not match.\n";
+                    return;
+                }
+                if (updatePin(accountno, newPin)) {
+                    pin = newPin;
+                    cout<<"=====================================\n";
+                    cout << "     PIN changed successfully.\n";
+                    cout<<"=====================================\n";
+                }
+                else {
+                    cout<<"=====================================\n";
+                    cout << "       PIN change failed.\n";
+                    cout<<"=====================================\n";
+                }
+            }
 };
 
 bool readChoice(int &value); 
@@ -821,26 +756,19 @@ struct AdminView{
 };
 
 bool parseAdminView(const string &line, AdminView &out){
-
     if(line.empty())
         return false;
-
     size_t pos1 = line.find('|');
     size_t pos2 = line.find('|', pos1 + 1);
     size_t pos3 = line.find('|', pos2 + 1);
     size_t pos4 = line.find('|', pos3 + 1);
     size_t pos5 = line.find('|', pos4 + 1);
-
-    if(pos1 == string::npos || pos2 == string::npos ||
-       pos3 == string::npos || pos4 == string::npos ||
-       pos5 == string::npos)
+    if(pos1 == string::npos || pos2 == string::npos || pos3 == string::npos || pos4 == string::npos || pos5 == string::npos)
         return false;
-
     string name = line.substr(0, pos1);
     string citizen = line.substr(pos1 + 1, pos2 - pos1 - 1);
     string accStr = line.substr(pos2 + 1, pos3 - pos2 - 1);
     string balStr = line.substr(pos5 + 1);
-
     try{
         out.accountno = stoi(accStr);
         out.holderName = name;
@@ -854,7 +782,7 @@ bool parseAdminView(const string &line, AdminView &out){
     return true;
 }
  
-void printAdminHeader(){  //displays the headere of the admin panel
+void printAdminHeader(){  //displays the header of the admin panel
     cout << left
          << setw(12) << "Acc No"
          << setw(24) << "Holder Name"
@@ -938,24 +866,25 @@ void adminSearch(){  //search the accounts using their account number
 bool adminLogin(){  //the admin login
     const string ADMIN_USER = "Narayush";
     const string ADMIN_PASS = "Narayush123";
- 
     string user, pass;
     cout << "Enter admin username: ";
     cin >> user;
     cout << "Enter admin password: ";
     cin >> pass;
- 
     if(user == ADMIN_USER && pass == ADMIN_PASS){
-        cout << "Admin login successful.\n";
+        cout<< "============================\n";
+        cout << "   Admin login successful.\n";
+        cout<< "============================\n";
         return true;
     }
-    cout << "Invalid admin credentials.\n";
+    cout<< "============================\n";
+    cout << "  Invalid admin credentials.\n";
+    cout<< "============================\n";
     return false;
 }
  
 void adminMenu(){   //admin panel display
     if(!adminLogin()) return;
- 
     int achoice = 0;
     do{
         cout << "\n--- ADMIN PANEL ---\n";
@@ -963,12 +892,10 @@ void adminMenu(){   //admin panel display
         cout << "2. Search a client by account number\n";
         cout << "3. Logout\n";
         cout << "Enter your choice: ";
- 
         if(!readChoice(achoice)){
             cout << "Invalid input! Please enter a number.\n";
             continue;
         }
- 
         switch(achoice){
             case 1:
                 adminViewAll();
@@ -977,7 +904,9 @@ void adminMenu(){   //admin panel display
                 adminSearch();
                 break;
             case 3:
-                cout << "Admin logged out.\n";
+                cout<<"=====================================\n";
+                cout << "         Admin logged out.\n";
+                cout<<"=====================================\n";
                 break;
             default:
                 cout << "Invalid option!\n";
@@ -996,29 +925,20 @@ bool readChoice(int &value){
 }
 
 int loadNextAccountNo(){
-
     ifstream inFile("accounts.dat");
-
     int maxNo = 999;
     string line;
-
     while(getline(inFile, line)){
         if(line.empty())
             continue;
-
         size_t pos1 = line.find('|');
         size_t pos2 = line.find('|', pos1 + 1);
         size_t pos3 = line.find('|', pos2 + 1);
-
-        if(pos1 == string::npos || pos2 == string::npos ||
-           pos3 == string::npos)
+        if(pos1 == string::npos || pos2 == string::npos || pos3 == string::npos)
             continue;
-
         string accNoStr = line.substr(pos2 + 1, pos3 - pos2 - 1);
-
         try{
             int accNo = stoi(accNoStr);
-
             if(accNo > maxNo)
                 maxNo = accNo;
         }
@@ -1026,7 +946,6 @@ int loadNextAccountNo(){
             continue;
         }
     }
-
     return maxNo + 1;
 }
 
@@ -1040,7 +959,7 @@ int main(){
         cout<< "2. Login\n";
         cout<< "3. Admin Login\n";
         cout<< "4. Close\n";
-        cout<< "Enter your choice: ";
+        cout<< "Enter your option: ";
 
         if(!readChoice(choice)){
             cout << "Invalid input! Please enter a number.\n";
